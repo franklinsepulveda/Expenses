@@ -418,19 +418,19 @@ const MEDIA = [
 
 const LINEAS = [
   'Supermercado','Comida — Feria','Comida — Panadería y varios','Comer fuera (Restaurante)',
-  'Combustible','Transporte y peajes','Salud y farmacia','Gastos Casa (jardinero+mantención)','Mantención Auto',
+  'Combustible','Transporte y peajes','Salud y farmacia','Gastos Casa (jardinero+mantención+materiales)','Mantención Auto',
   'Entretenimiento','Regalos y celebraciones','Ropa',
   'Colegio (colegiatura UF)','Clases de violín','Isapre Colmena','Crédito automotriz',
   'Gastos comunes','Seguros','Suscripciones digitales','Comisiones bancarias',
   'Cuentas casa — Gas','Cuentas casa — Luz','Cuentas casa — Agua','Cuentas casa — Autopistas',
-  'Cuentas casa — GTD internet','Cuentas casa — Movistar','Cuentas casa — Khipu',
+  'Cuentas casa — GTD internet','Cuentas casa — Movistar/Khipu',
   'Viaje Amanda (Raitrai)','Colchón imprevistos',
   '— Fuera de presupuesto (spot)','— Excluir (no es gasto del mes)'
 ];
 
 const FRECUENTES = [
   'Supermercado','Comida — Panadería y varios','Comida — Feria','Comer fuera (Restaurante)',
-  'Combustible','Transporte y peajes','Salud y farmacia','Gastos Casa (jardinero+mantención)','Entretenimiento','Mantención Auto'
+  'Combustible','Transporte y peajes','Salud y farmacia','Gastos Casa (jardinero+mantención+materiales)','Entretenimiento','Mantención Auto'
 ];
 
 /* diccionario semilla: fragmento de comercio → línea */
@@ -460,9 +460,9 @@ const DICC = {
   'NETFLIX':'Suscripciones digitales','SPOTIFY':'Suscripciones digitales','HBO':'Suscripciones digitales',
   'GOOGLE':'Suscripciones digitales','MICROSOFT':'Suscripciones digitales','APPLE':'Suscripciones digitales',
   'ANTHROPIC':'Suscripciones digitales',
-  'WALDO':'Gastos Casa (jardinero+mantención)','JARDINERO':'Gastos Casa (jardinero+mantención)','ENEL X':'Gastos Casa (jardinero+mantención)','DICO':'Gastos Casa (jardinero+mantención)',
-  'MYMUEBL':'Gastos Casa (jardinero+mantención)','BIX':'Gastos Casa (jardinero+mantención)','SODIMAC':'Gastos Casa (jardinero+mantención)','EASY':'Gastos Casa (jardinero+mantención)',
-  'PANDA ORIENTAL':'Gastos Casa (jardinero+mantención)',
+  'WALDO':'Gastos Casa (jardinero+mantención+materiales)','JARDINERO':'Gastos Casa (jardinero+mantención+materiales)','ENEL X':'Gastos Casa (jardinero+mantención+materiales)','DICO':'Gastos Casa (jardinero+mantención+materiales)',
+  'MYMUEBL':'Gastos Casa (jardinero+mantención+materiales)','BIX':'Gastos Casa (jardinero+mantención+materiales)','SODIMAC':'Gastos Casa (jardinero+mantención+materiales)','EASY':'Gastos Casa (jardinero+mantención+materiales)',
+  'PANDA ORIENTAL':'Gastos Casa (jardinero+mantención+materiales)',
   'FALABELLA':'Ropa','COLLOKY':'Ropa','CONFECC':'Ropa','PARIS':'Ropa','H&M':'Ropa','ZARA':'Ropa',
   'LA FETE':'Regalos y celebraciones','REUSE':'Regalos y celebraciones','NOVIOS':'Regalos y celebraciones',
   'RAITRAI':'Viaje Amanda (Raitrai)',
@@ -470,7 +470,7 @@ const DICC = {
   'PUMAHUE':'Colegio (colegiatura UF)','PAYCWPS':'Colegio (colegiatura UF)',
   'COLMENA':'Isapre Colmena','AUTOPISTA':'Cuentas casa — Autopistas','VESPUCIO':'Cuentas casa — Autopistas',
   'METROGAS':'Cuentas casa — Gas','ENEL':'Cuentas casa — Luz','AGUAS ANDINAS':'Cuentas casa — Agua',
-  'GTD':'Cuentas casa — GTD internet','MOVISTAR':'Cuentas casa — Movistar','KHIPU':'Cuentas casa — Khipu',
+  'GTD':'Cuentas casa — GTD internet','MOVISTAR':'Cuentas casa — Movistar/Khipu','KHIPU':'Cuentas casa — Movistar/Khipu',
   'CONSORCIO':'Seguros','BCI SEGUROS':'Seguros','BANCHILE':'Seguros'
 };
 
@@ -553,7 +553,7 @@ function renderLineas(){
   if (sel.linea && !lista.includes(sel.linea)) lista.unshift(sel.linea);
   lista.forEach(l=>{
     const b=document.createElement('button');
-    b.className='chip wide'; b.textContent=l.replace('Comida — ','').replace(' (Restaurante)','').replace('Cuentas casa — ','').replace(' (jardinero+mantención)','').replace(' (colegiatura UF)','');
+    b.className='chip wide'; b.textContent=l.replace('Comida — ','').replace(' (Restaurante)','').replace('Cuentas casa — ','').replace(' (jardinero+mantención+materiales)','').replace(' (colegiatura UF)','');
     b.setAttribute('aria-pressed', String(sel.linea===l));
     b.onclick=()=>{ sel.linea = (sel.linea===l ? null : l); renderLineas(); validar(); };
     cont.appendChild(b);
@@ -799,8 +799,6 @@ const PPTO = {
   'Cuentas casa — Agua'               : [50000,45000,40000,40000,40000,40000],
   'Cuentas casa — Autopistas'         : seis(36000),
   'Cuentas casa — GTD internet'       : seis(36000),
-  'Cuentas casa — Movistar'           : seis(14000),
-  'Cuentas casa — Khipu'              : seis(7000),
   'Cuentas casa — Movistar/Khipu'     : seis(21000),
   'Supermercado'                      : seis(600000),
   'Comida — Feria'                    : seis(120000),
@@ -808,7 +806,7 @@ const PPTO = {
   'Combustible'                       : [120000,60000,60000,60000,60000,60000],
   'Transporte y peajes'               : seis(50000),
   'Salud y farmacia'                  : seis(30000),
-  'Gastos Casa (jardinero+mantención)': seis(80000),
+  'Gastos Casa (jardinero+mantención+materiales)': seis(80000),
   'Mantención Auto'                   : seis(30000),
   'Comer fuera (Restaurante)'         : seis(200000),
   'Entretenimiento'                   : seis(60000),
@@ -819,27 +817,54 @@ const PPTO = {
 };
 /* líneas de monto fijo: se pagan de una vez, no acumulan durante el mes */
 const PAGO_UNICO = new Set(['Colegio (colegiatura UF)','Clases de violín','Isapre Colmena','Crédito automotriz',
-  'Gastos comunes','Seguros','Suscripciones digitales','Cuentas casa — Gas','Cuentas casa — Luz',
-  'Cuentas casa — Agua','Cuentas casa — GTD internet','Cuentas casa — Movistar','Cuentas casa — Khipu',
-  'Viaje Amanda (Raitrai)']);
+  'Gastos comunes','Seguros','Cuentas casa — Gas','Cuentas casa — Luz','Cuentas casa — Agua',
+  'Cuentas casa — GTD internet','Viaje Amanda (Raitrai)']);
 /* las que Franklin sigue de cerca: variables y con margen de gestión */
 const SEGUIMIENTO = ['Supermercado','Comida — Feria','Comida — Panadería y varios','Comer fuera (Restaurante)',
-  'Transporte y peajes','Gastos Casa (jardinero+mantención)','Entretenimiento','Regalos y celebraciones',
+  'Transporte y peajes','Gastos Casa (jardinero+mantención+materiales)','Entretenimiento','Regalos y celebraciones',
   'Cuentas casa — Gas','Cuentas casa — Luz','Cuentas casa — Agua','Cuentas casa — Autopistas',
   'Seguros','Suscripciones digitales'];
 
 /* nombres cortos que usó una versión anterior de la app: se corrigen en el registro */
 const MIGRAR = {
-  'Gastos Casa'          : 'Gastos Casa (jardinero+mantención)',
-  'Colegio (colegiatura)': 'Colegio (colegiatura UF)'
+  'Gastos Casa'                       : 'Gastos Casa (jardinero+mantención+materiales)',
+  'Gastos Casa (jardinero+mantención)': 'Gastos Casa (jardinero+mantención+materiales)',
+  'Colegio (colegiatura)'             : 'Colegio (colegiatura UF)',
+  'Cuentas casa — Movistar'           : 'Cuentas casa — Movistar/Khipu',
+  'Cuentas casa — Khipu'              : 'Cuentas casa — Movistar/Khipu'
 };
 /* líneas que el presupuesto vigente unificó: se agrupan solo para mostrar,
    el registro conserva el nombre original para no romper la exportación */
-const AGRUPA = {
-  'Cuentas casa — Movistar': 'Cuentas casa — Movistar/Khipu',
-  'Cuentas casa — Khipu'   : 'Cuentas casa — Movistar/Khipu'
+const canon = l => MIGRAR[l] || l;
+
+/* meta del plan de recorte, columna J del tracker. Solo los meses que la tienen definida. */
+const META = {
+  '2026-09': {
+    'Colegio (colegiatura UF)':1096000, 'Clases de violín':90000, 'Isapre Colmena':397590,
+    'Crédito automotriz':399883, 'Gastos comunes':55000, 'Seguros':95000,
+    'Suscripciones digitales':40000, 'Comisiones bancarias':3000, 'Cuentas casa — Gas':307063,
+    'Cuentas casa — Luz':85000, 'Cuentas casa — Agua':40000, 'Cuentas casa — Autopistas':20000,
+    'Cuentas casa — GTD internet':36000, 'Cuentas casa — Movistar/Khipu':21000,
+    'Supermercado':600000, 'Comida — Feria':100000, 'Comida — Panadería y varios':40000,
+    'Combustible':50000, 'Transporte y peajes':25000, 'Salud y farmacia':25000,
+    'Gastos Casa (jardinero+mantención+materiales)':30000, 'Mantención Auto':0,
+    'Comer fuera (Restaurante)':80000, 'Entretenimiento':0, 'Regalos y celebraciones':30000,
+    'Ropa':0, 'Viaje Amanda (Raitrai)':118000, 'Colchón imprevistos':0
+  }
 };
-const canon = l => AGRUPA[l] || l;
+/* cuotas comprometidas del mes: no se capturan, pero pesan en el total */
+const CUOTAS = { '2026-08':1153416, '2026-09':1066406, '2026-10':877508, '2026-11':773694, '2026-12':418870 };
+
+const hayMeta = per => !!META[per];
+function metaDe(linea, per){
+  const m = META[per];
+  return (m && m[linea] != null) ? m[linea] : null;
+}
+/* referencia activa del panel: la meta cuando existe, si no el presupuesto */
+function refDe(linea, per){
+  if (refModo === 'meta'){ const m = metaDe(linea, per); if (m !== null) return m; }
+  return pptoDe(linea, per);
+}
 
 function pptoDe(linea, periodo){
   const ov = (ajustes.ppto||{})[periodo];
@@ -974,6 +999,8 @@ async function copiar(texto, msg){
 
 /* ---------------- panel de control ---------------- */
 let verTodasCat = false;
+let refModo = 'meta';        /* 'meta' o 'ppto' · la meta manda cuando el mes la tiene
+                                (ingreso recurrente $0: el número que obliga es la meta) */
 
 function curvaSVG(items, presu, av){
   const W=700, H=180, mL=4, mR=4, mT=10, mB=18;
@@ -1026,22 +1053,28 @@ function renderPanel(){
     ? [...new Set(LINEAS.filter(l=>!l.startsWith('—')).map(canon))]
     : SEGUIMIENTO;
 
+  const usandoMeta = refModo==='meta' && hayMeta(per);
+
   const filas = lineas.map(l=>{
-    const real = delPeriodo.filter(g=>canon(g.linea)===l).reduce((s,g)=>s+g.monto,0);
-    const ppto = pptoDe(l, per);
+    const real  = delPeriodo.filter(g=>canon(g.linea)===l).reduce((s,g)=>s+g.monto,0);
+    const ppto  = pptoDe(l, per);
+    const meta  = metaDe(l, per);
+    const ref   = refDe(l, per);
     const unico = PAGO_UNICO.has(l);
-    const [est, cls] = estadoDe(real, ppto, unico, av.avance);
-    return { linea:l, real, ppto, unico, est, cls, proy:proyectar(real, ppto, unico, av.avance) };
+    const [est, cls] = estadoDe(real, ref, unico, av.avance);
+    return { linea:l, real, ppto, meta, ref, unico, est, cls, proy:proyectar(real, ref, unico, av.avance) };
   }).sort((a,b)=>{
     const ord = {ex:0, al:1, ok:2, gr:3};
     if (ord[a.cls] !== ord[b.cls]) return ord[a.cls]-ord[b.cls];
-    return (b.ppto?b.real/b.ppto:0) - (a.ppto?a.real/a.ppto:0);
+    return (b.ref?b.real/b.ref:0) - (a.ref?a.real/a.ref:0);
   });
 
   const totReal = filas.reduce((s,f)=>s+f.real,0);
-  const totPpto = filas.reduce((s,f)=>s+f.ppto,0);
+  const totPpto = filas.reduce((s,f)=>s+f.ref,0);
+  const totOtro = filas.reduce((s,f)=>s+(usandoMeta ? f.ppto : (f.meta!==null?f.meta:f.ppto)),0);
   const totProy = filas.reduce((s,f)=>s+f.proy,0);
   const desvio  = totProy - totPpto;
+  const cuotas  = CUOTAS[per] || 0;
   const totMes  = delPeriodo.reduce((s,g)=>s+g.monto,0);
   const seguidos = new Set(lineas);
   const enSet = g => seguidos.has(canon(g.linea));
@@ -1050,12 +1083,18 @@ function renderPanel(){
   const pct = totPpto ? totReal/totPpto : 0;
   const itemsSeguidos = delPeriodo.filter(enSet);
 
-  let h = `
+  let h = '';
+  if (hayMeta(per)) h += `
+  <div class="chips" style="margin-bottom:16px">
+    <button class="chip" id="refMeta" aria-pressed="${usandoMeta}">Meta de recorte</button>
+    <button class="chip" id="refPpto" aria-pressed="${!usandoMeta}">Presupuesto</button>
+  </div>`;
+  h += `
   <div class="kpis">
     <div>
       <div class="lab">Gastado</div>
       <div class="big">${fmtCLP(totReal)}</div>
-      <div class="sub">de ${fmtCLP(totPpto)} · ${Math.round(pct*100)}% usado</div>
+      <div class="sub">de ${fmtCLP(totPpto)} ${usandoMeta?'de meta':'de presupuesto'} · ${Math.round(pct*100)}% usado</div>
     </div>
     <div class="der">
       <div class="lab">Avance</div>
@@ -1077,7 +1116,7 @@ function renderPanel(){
       <div class="v" style="color:${desvio>0?'var(--alert)':'var(--jade)'}">${fmtCLP(totProy)}</div>
     </div>
     <div class="d" style="color:${desvio>0?'var(--alert)':'var(--jade)'}">
-      ${desvio>0?'+':''}${fmtCLP(desvio)}<br><span style="color:var(--muted)">vs presupuesto</span>
+      ${desvio>0?'+':''}${fmtCLP(desvio)}<br><span style="color:var(--muted)">vs ${usandoMeta?'meta':'presupuesto'}</span>
     </div>
   </div>
 
@@ -1087,18 +1126,18 @@ function renderPanel(){
   </div>`;
 
   filas.forEach(f=>{
-    const uso = f.ppto ? Math.min(f.real/f.ppto, 1) : (f.real?1:0);
+    const uso = f.ref ? Math.min(f.real/f.ref, 1) : (f.real?1:0);
     const marca = Math.min(av.avance, 1)*100;
     const color = f.cls==='ex' ? 'var(--alert)' : f.cls==='al' ? 'var(--amber)' : 'var(--jade)';
     const corto = f.linea.replace('Cuentas casa — ','').replace('Comida — ','')
-                         .replace(' (Restaurante)','').replace(' (jardinero+mantención)','')
+                         .replace(' (Restaurante)','').replace(' (jardinero+mantención+materiales)','')
                          .replace(' (colegiatura UF)','');
     h += `
     <div class="cat">
       <div class="fila">
         <span class="nom">${corto}</span>
         <span class="num" data-linea="${encodeURIComponent(f.linea)}" data-ppto="${f.ppto}">
-          <b>${fmtCLP(f.real)}</b> / ${fmtCLP(f.ppto)}</span>
+          <b>${fmtCLP(f.real)}</b> / ${fmtCLP(f.ref)}</span>
       </div>
       <div class="barra">
         <div class="relleno" style="width:${(uso*100).toFixed(1)}%;background:${color}"></div>
@@ -1106,17 +1145,20 @@ function renderPanel(){
       </div>
       <div class="pie">
         <span class="est ${f.cls}">${f.est}</span>
-        <span style="color:var(--muted)">proyecta ${fmtCLP(f.proy)}</span>
+        <span style="color:var(--muted)">${usandoMeta?'ppto':'meta'} ${fmtCLP(usandoMeta?f.ppto:(f.meta!==null?f.meta:f.ppto))} · proyecta ${fmtCLP(f.proy)}</span>
       </div>
     </div>`;
   });
 
   if (fuera > 0) h += `<p class="hint">Además hay ${fmtCLP(fuera)} en líneas fuera de este listado (fijas, spot o excluidas). El total capturado del período es ${fmtCLP(totMes)}.</p>`;
+  if (cuotas) h += `<p class="hint">Este mes carga además ${fmtCLP(cuotas)} en cuotas comprometidas, que no se capturan acá. Con eso el gasto del período va en ${fmtCLP(totMes + cuotas)}.</p>`;
   if (!delPeriodo.length) h += `<p class="hint">Todavía no hay gastos cargados en este período.</p>`;
-  h += `<p class="hint">Presupuesto base v8, cierre de agosto 2026, con cifras propias hasta diciembre. ${MESES_PPTO.indexOf(per)<0?'Este mes no tiene columna propia: usa la de diciembre. ':''}Toca una cifra de presupuesto para ajustarla solo en este mes. El avance se calcula solo: promedia el día del mes calendario con el día del ciclo de tarjeta.</p>`;
+  h += `<p class="hint">${hayMeta(per)?'Presupuesto y meta tomados del tracker de '+periodoLabel(per)+'. ':'Presupuesto base v8, cierre de agosto 2026. '} ${MESES_PPTO.indexOf(per)<0?'Este mes no tiene columna propia: usa la de diciembre. ':''}Toca una cifra de presupuesto para ajustarla solo en este mes. El avance se calcula solo: promedia el día del mes calendario con el día del ciclo de tarjeta.</p>`;
 
   $('panelBody').innerHTML = h;
   $('verTodas').onclick = ()=>{ verTodasCat = !verTodasCat; renderPanel(); };
+  if ($('refMeta')) $('refMeta').onclick = ()=>{ refModo='meta'; renderPanel(); };
+  if ($('refPpto')) $('refPpto').onclick = ()=>{ refModo='ppto'; renderPanel(); };
   $('panelBody').querySelectorAll('.num').forEach(el=>{
     el.onclick = ()=> editarPpto(el, per);
   });
