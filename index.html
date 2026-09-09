@@ -791,20 +791,21 @@ const PPTO = {
   'Isapre Colmena'                    : seis(360000),
   'Crédito automotriz'                : seis(400000),
   'Gastos comunes'                    : seis(55000),
-  'Seguros'                           : seis(129000),
+  'Seguros'                           : [129000,109000,109000,109000,109000,109000],
   'Suscripciones digitales'           : [75000,50000,50000,50000,50000,50000],
   'Comisiones bancarias'              : seis(12000),
-  'Cuentas casa — Gas'                : [200000,200000,150000,100000,60000,40000],
+  'Cuentas casa — Gas'                : [200000,283120,307063,120000,70000,45000],
   'Cuentas casa — Luz'                : [100000,100000,75000,70000,70000,90000],
   'Cuentas casa — Agua'               : [50000,45000,40000,40000,40000,40000],
   'Cuentas casa — Autopistas'         : seis(36000),
   'Cuentas casa — GTD internet'       : seis(36000),
   'Cuentas casa — Movistar'           : seis(14000),
   'Cuentas casa — Khipu'              : seis(7000),
+  'Cuentas casa — Movistar/Khipu'     : seis(21000),
   'Supermercado'                      : seis(600000),
   'Comida — Feria'                    : seis(120000),
   'Comida — Panadería y varios'       : seis(80000),
-  'Combustible'                       : seis(120000),
+  'Combustible'                       : [120000,60000,60000,60000,60000,60000],
   'Transporte y peajes'               : seis(50000),
   'Salud y farmacia'                  : seis(30000),
   'Gastos Casa (jardinero+mantención)': seis(80000),
@@ -826,6 +827,19 @@ const SEGUIMIENTO = ['Supermercado','Comida — Feria','Comida — Panadería y 
   'Transporte y peajes','Gastos Casa (jardinero+mantención)','Entretenimiento','Regalos y celebraciones',
   'Cuentas casa — Gas','Cuentas casa — Luz','Cuentas casa — Agua','Cuentas casa — Autopistas',
   'Seguros','Suscripciones digitales'];
+
+/* nombres cortos que usó una versión anterior de la app: se corrigen en el registro */
+const MIGRAR = {
+  'Gastos Casa'          : 'Gastos Casa (jardinero+mantención)',
+  'Colegio (colegiatura)': 'Colegio (colegiatura UF)'
+};
+/* líneas que el presupuesto vigente unificó: se agrupan solo para mostrar,
+   el registro conserva el nombre original para no romper la exportación */
+const AGRUPA = {
+  'Cuentas casa — Movistar': 'Cuentas casa — Movistar/Khipu',
+  'Cuentas casa — Khipu'   : 'Cuentas casa — Movistar/Khipu'
+};
+const canon = l => AGRUPA[l] || l;
 
 function pptoDe(linea, periodo){
   const ov = (ajustes.ppto||{})[periodo];
@@ -1009,11 +1023,11 @@ function renderPanel(){
   const av = avanceDe(per);
   const delPeriodo = gastos.filter(g=>g.periodo===per);
   const lineas = verTodasCat
-    ? LINEAS.filter(l=>!l.startsWith('—'))
+    ? [...new Set(LINEAS.filter(l=>!l.startsWith('—')).map(canon))]
     : SEGUIMIENTO;
 
   const filas = lineas.map(l=>{
-    const real = delPeriodo.filter(g=>g.linea===l).reduce((s,g)=>s+g.monto,0);
+    const real = delPeriodo.filter(g=>canon(g.linea)===l).reduce((s,g)=>s+g.monto,0);
     const ppto = pptoDe(l, per);
     const unico = PAGO_UNICO.has(l);
     const [est, cls] = estadoDe(real, ppto, unico, av.avance);
@@ -1030,10 +1044,11 @@ function renderPanel(){
   const desvio  = totProy - totPpto;
   const totMes  = delPeriodo.reduce((s,g)=>s+g.monto,0);
   const seguidos = new Set(lineas);
+  const enSet = g => seguidos.has(canon(g.linea));
   const fuera = totMes - totReal;
 
   const pct = totPpto ? totReal/totPpto : 0;
-  const itemsSeguidos = delPeriodo.filter(g=>seguidos.has(g.linea));
+  const itemsSeguidos = delPeriodo.filter(enSet);
 
   let h = `
   <div class="kpis">
@@ -1098,7 +1113,7 @@ function renderPanel(){
 
   if (fuera > 0) h += `<p class="hint">Además hay ${fmtCLP(fuera)} en líneas fuera de este listado (fijas, spot o excluidas). El total capturado del período es ${fmtCLP(totMes)}.</p>`;
   if (!delPeriodo.length) h += `<p class="hint">Todavía no hay gastos cargados en este período.</p>`;
-  h += `<p class="hint">Toca una cifra de presupuesto para ajustarla solo en este mes. El avance se calcula solo: promedia el día del mes calendario con el día del ciclo de tarjeta.</p>`;
+  h += `<p class="hint">Presupuesto base v8, cierre de agosto 2026, con cifras propias hasta diciembre. ${MESES_PPTO.indexOf(per)<0?'Este mes no tiene columna propia: usa la de diciembre. ':''}Toca una cifra de presupuesto para ajustarla solo en este mes. El avance se calcula solo: promedia el día del mes calendario con el día del ciclo de tarjeta.</p>`;
 
   $('panelBody').innerHTML = h;
   $('verTodas').onclick = ()=>{ verTodasCat = !verTodasCat; renderPanel(); };
@@ -1168,6 +1183,12 @@ function renderAjustes(){
   aprendidos = (await Store.get('aprendidos:v1')) || {};
   const a    = await Store.get('ajustes:v1');
   if (a) ajustes = Object.assign(ajustes, a);
+
+  /* corrige de una vez los nombres cortos que guardó la versión anterior */
+  let migrados = 0;
+  gastos.forEach(g=>{ if (MIGRAR[g.linea]){ g.linea = MIGRAR[g.linea]; migrados++; } });
+  for (const k in aprendidos) if (MIGRAR[aprendidos[k]]) aprendidos[k] = MIGRAR[aprendidos[k]];
+  if (migrados){ await Store.set('gastos:v1', gastos); await Store.set('aprendidos:v1', aprendidos); }
 
   if (Store.mode==='mem'){
     $('storeState').textContent='SIN GUARDADO';
