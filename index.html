@@ -710,6 +710,7 @@ function stub(texto, malo){
 function periodosDisponibles(){
   const set = new Set(gastos.map(g=>g.periodo));
   set.add(periodoDe(hoyISO(), 'calendario'));
+  set.add(periodoDe(hoyISO(), 'corte22'));   /* desde el 23 ya se puede mirar el mes siguiente */
   return [...set].sort().reverse();
 }
 function renderRegistro(){
@@ -791,11 +792,11 @@ const PPTO = {
   'Isapre Colmena'                    : seis(360000),
   'Crédito automotriz'                : seis(400000),
   'Gastos comunes'                    : seis(55000),
-  'Seguros'                           : [129000,109000,109000,109000,109000,109000],
-  'Suscripciones digitales'           : [75000,50000,50000,50000,50000,50000],
+  'Seguros'                           : [129000,109000,109000,95000,109000,109000],
+  'Suscripciones digitales'           : [75000,50000,50000,55000,50000,50000],
   'Comisiones bancarias'              : seis(12000),
-  'Cuentas casa — Gas'                : [200000,283120,307063,120000,70000,45000],
-  'Cuentas casa — Luz'                : [100000,100000,75000,70000,70000,90000],
+  'Cuentas casa — Gas'                : [200000,283120,307063,180000,70000,45000],
+  'Cuentas casa — Luz'                : [100000,100000,75000,75000,70000,90000],
   'Cuentas casa — Agua'               : [50000,45000,40000,40000,40000,40000],
   'Cuentas casa — Autopistas'         : seis(36000),
   'Cuentas casa — GTD internet'       : seis(36000),
@@ -850,10 +851,22 @@ const META = {
     'Gastos Casa (jardinero+mantención+materiales)':30000, 'Mantención Auto':0,
     'Comer fuera (Restaurante)':80000, 'Entretenimiento':0, 'Regalos y celebraciones':30000,
     'Ropa':0, 'Viaje Amanda (Raitrai)':118000, 'Colchón imprevistos':0
+  },
+  '2026-10': {
+    'Colegio (colegiatura UF)':1100000, 'Clases de violín':90000, 'Isapre Colmena':390000,
+    'Crédito automotriz':399883, 'Gastos comunes':55000, 'Seguros':95000,
+    'Suscripciones digitales':40000, 'Comisiones bancarias':3000, 'Cuentas casa — Gas':180000,
+    'Cuentas casa — Luz':75000, 'Cuentas casa — Agua':40000, 'Cuentas casa — Autopistas':20000,
+    'Cuentas casa — GTD internet':25000, 'Cuentas casa — Movistar/Khipu':21000,
+    'Supermercado':520000, 'Comida — Feria':100000, 'Comida — Panadería y varios':40000,
+    'Combustible':50000, 'Transporte y peajes':25000, 'Salud y farmacia':25000,
+    'Gastos Casa (jardinero+mantención+materiales)':30000, 'Mantención Auto':20000,
+    'Comer fuera (Restaurante)':80000, 'Entretenimiento':15000, 'Regalos y celebraciones':30000,
+    'Ropa':0, 'Viaje Amanda (Raitrai)':118000, 'Colchón imprevistos':0
   }
 };
 /* cuotas comprometidas del mes: no se capturan, pero pesan en el total */
-const CUOTAS = { '2026-08':1153416, '2026-09':1066406, '2026-10':877508, '2026-11':773694, '2026-12':418870 };
+const CUOTAS = { '2026-08':1153416, '2026-09':1066406, '2026-10':852022, '2026-11':773694, '2026-12':418870 };
 
 const hayMeta = per => !!META[per];
 function metaDe(linea, per){

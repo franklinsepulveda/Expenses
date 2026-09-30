@@ -1,5 +1,5 @@
 /* Gasto — cache offline. Sube la versión si cambias index.html. */
-const CACHE = 'gasto-v5';
+const CACHE = 'gasto-v6';
 const ASSETS = ['./', './index.html', './icon.png'];
 
 self.addEventListener('install', e => {
